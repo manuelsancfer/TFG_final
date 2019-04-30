@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+~~~~~~~~~~~~~~~~~~~~
+VNX Sample scenarios
+~~~~~~~~~~~~~~~~~~~~
+Name: Distribución multicast sobre redes IP
+Description: DISEÑO E IMPLEMENTACIÓN DE UN SISTEMA PARA LA DISTRIBUCIÓN
+MULTICAST SOBRE REDES IP DE SEÑALES RADIO DIGITALIZADAS. APLICACIÓN A LA ESTACIÓN DE SEGUIMIENTO DE SATÉLITES DE TERRASSA (TGS).
+(www: http://www.dit.upm.es/vnx - e-mail: vnx@dit.upm.es)
+osboxes
+-->
+<vnx xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:noNamespaceSchemaLocation="/usr/share/xml/vnx/vnx-2.00.xsd">
+  <global>
+    <version>2.0</version>
+    <scenario_name>tfg_TGS</scenario_name>
+    <automac offset="4"/>
+    <!--vm_mgmt type="none" /!-->
+    <vm_mgmt type="private" network="10.250.0.0" mask="24" offset="12">
+       <host_mapping />
+    </vm_mgmt>
+    <vm_defaults>
+        <console id="0" display="yes"/>
+        <console id="1" display="yes"/>
+    </vm_defaults>
+  </global>
+
+  <net name="Net0" mode="virtual_bridge" />
+  <net name="Net1" mode="virtual_bridge" />
+  <net name="Net2" mode="virtual_bridge" />
+  <net name="Net3" mode="virtual_bridge" />
+  <net name="virbr0" mode="virtual_bridge" managed="no"/>
+
+
+  <vm name="mcvpn_server" type="lxc" exec_mode="lxc-attach" arch="x86_64">
+    <filesystem type="cow">/usr/share/vnx/filesystems/rootfs_lxc_ubuntu64</filesystem>
+    <if id="2" net="Net1">
+      <ipv4>10.1.1.2/24</ipv4>
+    </if>
+    <if id="4" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <if id="3" net="Net3">
+      <ipv4>10.1.3.1/24</ipv4>
+    </if>
+   <route type="ipv4" gw="10.1.1.1">10.1.0.0/24</route>
+   <route type="ipv4" gw="10.1.1.1">10.1.2.0/24</route>
+   <route type="ipv4" gw="0.0.0.0">default</route>
+   <!--<filetree seq="on_boot" root="/root/">files/mcvpnserver/client-configs</filetree>
+   <filetree seq="on_boot" root="/root/">files/mcvpnserver/openvpn-ca</filetree>-->
+   <filetree seq="on_boot" root="/etc/">files/mcvpnserver/etc/</filetree>
+   <filetree seq="on_boot" root="/usr/">files/mcvpnserver/usr/</filetree>
+   <filetree seq="on_boot" root="/root/">files/mcvpnserver/tools/sap-1.0</filetree>
+   <!-- filetree seq="on_boot" root="/etc/openvpn/">files/mcvpnserver/etc/openvpn/</filetree>
+   <filetree seq="on_boot" root="/etc/ppp/">files/mcvpnserver/etc/ppp/</filetree-->
+   <exec seq="mcvpnstart" type="verbatim" ostype="system">systemctl stop smcroute</exec>
+   <exec seq="mcvpnstart" type="verbatim" ostype="system">systemctl start pptpd</exec>
+   <exec seq="igmpstart" type="verbatim" ostype="system"> nohup /usr/local/bin/igmpproxy /usr/local/etc/igmpproxy.conf</exec>
+   <!--<filetree seq="on_boot" root="/root/">sap-1.0</filetree>
+   <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
+   <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
+
+   <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
+   <exec seq="smcrestart" type="verbatim" ostype="system">systemctl restart smcroute</exec>
+   <exec seq="smcaddroute" type="verbatim" ostype="system">smcroute -a eth3 0.0.0.0 239.1.1.1 tun0</exec>
+   <exec seq="ovpnstop" type="verbatim" ostype="system">systemctl stop openvpn@server.service</exec>-->
+ </vm>
+
+
+  <vm name="client1" type="lxc" exec_mode="lxc-attach" arch="x86_64">
+    <filesystem type="cow">/usr/share/vnx/filesystems/rootfs_lxc_ubuntu64</filesystem>
+    <if id="1" net="Net0">
+      <ipv4>10.1.0.2/24</ipv4>
+    </if>
+    <if id="4" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+   <route type="ipv4" gw="10.1.0.1">10.1.1.0/24</route>
+   <route type="ipv4" gw="10.1.0.1">10.1.2.0/24</route>
+   <route type="ipv4" gw="0.0.0.0">default</route>
+   <filetree seq="on_boot" root="/root/">files/client1/tools/</filetree>
+   <filetree seq="on_boot" root="/root/">sap-1.0</filetree>
+   <filetree seq="on_boot" root="/root/">files/mcvpnserver/tools/sap-1.0</filetree>
+   <!--<filetree seq="on_boot" root="/etc/openvpn">files/client1/etc/openvpn/*</filetree>-->
+   <filetree seq="on_boot" root="/etc/ppp/">files/client1/etc/ppp/</filetree>
+   <!--<exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@client.service</exec>
+   <exec seq="ovpnstop" type="verbatim" ostype="system">systemctl stop openvpn@client.service</exec>-->
+   </vm>
+
+
+ <vm name="client3" type="lxc" exec_mode="lxc-attach" arch="x86_64">
+    <filesystem type="cow">/usr/share/vnx/filesystems/rootfs_lxc_ubuntu64</filesystem>
+    <if id="3" net="Net2">
+      <ipv4>10.1.2.2/24</ipv4>
+    </if>
+    <if id="4" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+   <route type="ipv4" gw="10.1.2.1">10.1.0.0/24</route>
+   <route type="ipv4" gw="10.1.2.1">10.1.1.0/24</route>
+   <route type="ipv4" gw="0.0.0.0">default</route>
+   <!--<filetree seq="on_boot" root="/root/">files/client3/tools/</filetree>-->
+   <filetree seq="on_boot" root="/root/">sap-1.0</filetree>
+   <filetree seq="on_boot" root="/etc/openvpn">files/client3/etc/openvpn/*</filetree>
+   <filetree seq="on_boot" root="/etc/ppp/">files/client3/etc/ppp/</filetree>
+  </vm>
+
+<vm name="sap_server" type="lxc" exec_mode="lxc-attach" arch="x86_64">
+    <filesystem type="cow">/usr/share/vnx/filesystems/rootfs_lxc_ubuntu64</filesystem>
+    <if id="4" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <if id="3" net="Net3">
+      <ipv4>10.1.3.2/24</ipv4>
+    </if>
+   <route type="ipv4" gw="10.1.1.1">10.1.0.0/24</route>
+   <route type="ipv4" gw="10.1.1.1">10.1.2.0/24</route>
+   <route type="ipv4" gw="0.0.0.0">default</route>
+   <!--<filetree seq="on_boot" root="/root/">files/sap_server/tools/</filetree>-->
+   <filetree seq="on_boot" root="/root/">sap-1.0</filetree>
+   <filetree seq="on_boot" root="/root/">files/mcvpnserver/tools/sap-1.0</filetree>
+   <!--<filetree seq="on_boot" root="/etc/openvpn">files/sap_server/etc/openvpn/*</filetree>-->
+   <filetree seq="on_boot" root="/etc/ppp/">files/sap_server/etc/ppp/</filetree>
+ </vm>
+
+
+  <vm name="router" type="lxc" exec_mode="lxc-attach" arch="x86_64">
+    <filesystem type="cow">/usr/share/vnx/filesystems/rootfs_lxc_ubuntu64</filesystem>
+    <if id="1" net="Net0">
+      <ipv4>10.1.0.1/24</ipv4>
+    </if>
+    <if id="2" net="Net1">
+      <ipv4>10.1.1.1/24</ipv4>
+    </if>
+    <if id="3" net="Net2">
+      <ipv4>10.1.2.1/24</ipv4>
+    </if>
+    <if id="4" net="virbr0">
+      <ipv4>dhcp</ipv4>
+    </if>
+    <forwarding type="ip" />
+   <route type="ipv4" gw="192.168.1.1">default</route>
+  </vm>
+
+
+  <host>
+    <hostif net="Net0">
+       <ipv4>10.1.0.3/24</ipv4>
+    </hostif>
+  </host>
+
+</vnx>

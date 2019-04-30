@@ -1,0 +1,30 @@
+pty "pptp 10.1.1.2 --nolaunchpppd"
+lock
+noauth
+nobsdcomp
+nodeflate
+name vpnuser
+remotename pptpd
+ipparam tgvpn
+require-mppe-128
+usepeerdns
+defaultroute
+persist
+MC_UDPRECV.SH
+#!/bin/bash
+
+usage() {
+local prgname=$(basename $0)
+echo "$prgname mcgroup port ifname"
+echo "    mcgroup .... ip multicast (ex. 239.1.1.1)"
+echo "    port ....... dst port (ex. 5000)"
+echo "    ifname ..... device name to receive mcast pkts"
+exit 0
+}
+
+[ $# -ne 3 ] && usage
+
+SRC=$1
+PORT=$2
+IF=$3
+socat  UDP4-RECV:$PORT,bind=$SRC,ip-add-membership=$SRC:$IF,reuseaddr -

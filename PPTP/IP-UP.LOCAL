@@ -1,0 +1,12 @@
+pty "pptp 10.1.1.2 --nolaunchpppd"
+lock
+noauth
+nobsdcomp
+nodeflate
+name vpnuser
+remotename pptpd
+ipparam tgvpn
+require-mppe-128
+usepeerdns
+defaultroute
+persist
