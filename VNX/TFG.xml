@@ -56,8 +56,7 @@ osboxes
    <exec seq="mcvpnstart" type="verbatim" ostype="system">systemctl stop smcroute</exec>
    <exec seq="mcvpnstart" type="verbatim" ostype="system">systemctl start pptpd</exec>
    <exec seq="igmpstart" type="verbatim" ostype="system"> nohup /usr/local/bin/igmpproxy /usr/local/etc/igmpproxy.conf</exec>
-   <!--<filetree seq="on_boot" root="/root/">sap-1.0</filetree>
-   <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
+<exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
    <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
 
    <exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@server.service</exec>
@@ -81,6 +80,7 @@ osboxes
    <filetree seq="on_boot" root="/root/">files/client1/tools/</filetree>
    <filetree seq="on_boot" root="/root/">sap-1.0</filetree>
    <filetree seq="on_boot" root="/root/">files/mcvpnserver/tools/sap-1.0</filetree>
+   <!--<filetree seq="on_boot" root="/root/">sap-1.0</filetree>
    <!--<filetree seq="on_boot" root="/etc/openvpn">files/client1/etc/openvpn/*</filetree>-->
    <filetree seq="on_boot" root="/etc/ppp/">files/client1/etc/ppp/</filetree>
    <!--<exec seq="ovpnstart" type="verbatim" ostype="system">systemctl start openvpn@client.service</exec>
@@ -121,6 +121,7 @@ osboxes
    <filetree seq="on_boot" root="/root/">files/mcvpnserver/tools/sap-1.0</filetree>
    <!--<filetree seq="on_boot" root="/etc/openvpn">files/sap_server/etc/openvpn/*</filetree>-->
    <filetree seq="on_boot" root="/etc/ppp/">files/sap_server/etc/ppp/</filetree>
+   <exec seq="route_add" type="verbatim" ostype="system"> route add -net 224.0.0.0/4 eth3</exec>
  </vm>
 
 
@@ -149,4 +150,4 @@ osboxes
     </hostif>
   </host>
 
-</vnx>
+</vnx

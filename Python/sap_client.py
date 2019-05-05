@@ -1,4 +1,3 @@
-
 # import libraries
 import sap
 import socket
@@ -8,7 +7,7 @@ import struct
 from panel import *
 from SatRegister import *
 
-# todo poner quees este debug
+# to draw in the terminal if the code is debugging
 sapdebug=0
 
 msg_list = []
@@ -55,7 +54,7 @@ def main():
 					if SatPanel.active == SatPanel._MainPanel:
 						maxsats = len(SatReg._SatRegister)
 						# Check if key ascii code is in the range from '0' (ascii 48) to ascii maxsats + 48:
-						# In other words ... check if keypressed a number between 0  and maxsats-1
+						# In other words ... check if keypressed a number between 0 and maxsats-1
 						if (k - 48) > -1 and (k - 48) < maxsats:
 							# Display Detailed information of satellite indexed by the keypressed
 							SatPanel.StatusInfo("Satellite idx %s" % (k-48))
@@ -184,4 +183,3 @@ def main():
 
 if __name__ == "__main__":
 	main()
-
